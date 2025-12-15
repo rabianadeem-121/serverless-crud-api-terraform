@@ -27,7 +27,7 @@ jobs:
 
       - name: Build and Push Image
         run: |
-          docker build -t node-crud-api .
+          docker build -t serverless-crud-api-terraform .
           docker tag serverless-crud-api-terraform:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
           docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
 
