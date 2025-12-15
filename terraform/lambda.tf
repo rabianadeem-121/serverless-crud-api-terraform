@@ -10,4 +10,6 @@ resource "aws_lambda_function" "crud_api" {
     security_group_ids = [aws_security_group.lambda_sg1.id]
   }
 
+}
+
 
