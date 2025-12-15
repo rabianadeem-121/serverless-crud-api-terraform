@@ -10,14 +10,4 @@ resource "aws_lambda_function" "crud_api" {
     security_group_ids = [aws_security_group.lambda_sg1.id]
   }
 
-  environment {
-    variables = {
-      DB_HOST     = aws_db_instance.postgres.address
-      DB_USER     = "admin"
-      DB_PASSWORD = var.db_password
-      DB_NAME     = "cruddb"
-    }
-  }
-}
-
 
