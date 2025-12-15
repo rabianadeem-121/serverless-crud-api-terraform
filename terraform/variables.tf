@@ -6,7 +6,7 @@ variable "key_name" {
 variable "db_username" {
   description = "Master username for the RDS instance"
   type        = string
-  default = appuser
+  default = "appuser"
 }
 
 variable "db_password" {
