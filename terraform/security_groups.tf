@@ -2,7 +2,7 @@
 
 # Lambda security group
 resource "aws_security_group" "lambda_sg" {
-  name        = "lambda-sg"
+  name        = "lambda-sg1"
   description = "Security group for Lambda functions"
   vpc_id      = aws_vpc.main.id   # replace with your VPC resource
 
@@ -19,7 +19,7 @@ resource "aws_security_group" "lambda_sg" {
     from_port   = 5432        # RDS PostgreSQL port
     to_port     = 5432
     protocol    = "tcp"
-    security_groups = [aws_security_group.rds_sg.id]  # allow Lambda → RDS
+    security_groups = [aws_security_group.rds_sg1.id]  # allow Lambda → RDS
   }
 
   tags = {
@@ -29,7 +29,7 @@ resource "aws_security_group" "lambda_sg" {
 
 # RDS security group
 resource "aws_security_group" "rds_sg" {
-  name        = "rds-sg"
+  name        = "rds-sg1"
   description = "Security group for RDS PostgreSQL"
   vpc_id      = aws_vpc.main.id
 
@@ -37,7 +37,7 @@ resource "aws_security_group" "rds_sg" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.lambda_sg.id] # allow Lambda → RDS
+    security_groups = [aws_security_group.lambda_sg1.id] # allow Lambda → RDS
   }
 
   egress {
