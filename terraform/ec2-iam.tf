@@ -1,3 +1,7 @@
+resource "random_id" "suffix" {
+  byte_length = 4  # generates 8 hex characters
+}
+
 resource "aws_iam_role" "ec2_role" {
   name = "ec2-ecr-role-${random_id.suffix.hex}"
 
