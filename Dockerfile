@@ -1,8 +1,11 @@
-FROM public.ecr.aws/lambda/nodejs:18
+FROM node:20-alpine
 
-COPY app/ ${LAMBDA_TASK_ROOT}
-COPY package.json .
+WORKDIR /app
 
+COPY package.json package-lock.json ./
 RUN npm install
 
-CMD ["handler.handler"]
+COPY . .
+
+EXPOSE 3000
+CMD ["npm", "start"]

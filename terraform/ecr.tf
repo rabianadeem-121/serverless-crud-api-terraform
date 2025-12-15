@@ -1,13 +1,11 @@
-resource "aws_ecr_repository" "api" {
-  name = "serverless-crud-api-terraform"
+resource "aws_ecr_repository" "node_api" {
+  name                 = "node-rest-api"
+  image_tag_mutability = "MUTABLE"
+
   image_scanning_configuration {
     scan_on_push = true
   }
-  tags = {
-    Project = "Serverless CRUD API"
-  }
 }
-
 output "ecr_repository_url" {
-  value = aws_ecr_repository.api.repository_url
+  value = aws_ecr_repository.node_api.repository_url
 }
