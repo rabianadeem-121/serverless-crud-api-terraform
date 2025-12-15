@@ -1,3 +1,3 @@
 resource "aws_ecr_repository" "api" {
-  name = "node-crud-api"
+  name = "serverless-crud-api-terraform"
 }
