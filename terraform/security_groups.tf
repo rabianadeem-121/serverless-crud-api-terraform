@@ -1,7 +1,7 @@
 # terraform/security_groups.tf
 
 # Lambda security group
-resource "aws_security_group" "lambda_sg" {
+resource "aws_security_group" "lambda_sg1" {
   name        = "lambda-sg1"
   description = "Security group for Lambda functions"
   vpc_id      = aws_vpc.main.id   # replace with your VPC resource
@@ -28,7 +28,7 @@ resource "aws_security_group" "lambda_sg" {
 }
 
 # RDS security group
-resource "aws_security_group" "rds_sg" {
+resource "aws_security_group" "rds_sg1" {
   name        = "rds-sg1"
   description = "Security group for RDS PostgreSQL"
   vpc_id      = aws_vpc.main.id

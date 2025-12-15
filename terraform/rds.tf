@@ -2,7 +2,7 @@ resource "aws_db_subnet_group" "main" {
   subnet_ids = aws_subnet.private[*].id
 }
 
-resource "aws_security_group" "rds_sg" {
+resource "aws_security_group" "rds_sg1" {
   vpc_id = aws_vpc.main.id
 
   ingress {
