@@ -12,27 +12,49 @@ jobs:
       contents: read
 
     steps:
+      # 1. Checkout repo
       - uses: actions/checkout@v4
 
-      - name: Configure AWS (OIDC)
+      # 2. Configure AWS OIDC
+      - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::011664843975:role/github-permissions
           aws-region: ap-south-1
 
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region ap-south-1 \
-          | docker login --username AWS --password-stdin 011664843975.dkr.ecr.ap-south-1.amazonaws.com
-
-      - name: Build and Push Image
-        run: |
-          docker build -t serverless-crud-api-terraform .
-          docker tag serverless-crud-api-terraform:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
-          docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
-
-      - name: Terraform Deploy
+      # 3. Terraform Init & Apply (create ECR, RDS, etc.)
+      - name: Terraform Init & Apply
         working-directory: terraform
         run: |
           terraform init
+          terraform fmt -check
+          terraform validate
+          terraform apply -auto-approve
+
+      # 4. Get ECR repository URL from Terraform output
+      - name: Get ECR Repo URL
+        id: ecr
+        working-directory: terraform
+        run: |
+          echo "REPO_URL=$(terraform output -raw ecr_repository_url)" >> $GITHUB_ENV
+
+      # 5. Login to ECR (via OIDC)
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 6. Build Docker image
+      - name: Build Docker Image
+        run: |
+          docker build -t serverless-crud-api-terraform .
+
+      # 7. Tag & push Docker image
+      - name: Tag and Push Docker Image
+        run: |
+          docker tag serverless-crud-api-terraform:latest $REPO_URL:latest
+          docker push $REPO_URL:latest
+
+      # 8. Update Lambda to use new image (Terraform)
+      - name: Terraform Deploy Lambda
+        working-directory: terraform
+        run: |
           terraform apply -auto-approve
