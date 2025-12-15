@@ -1,7 +1,15 @@
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "rds-subnet-group"
-  subnet_ids = [aws_subnet.public.id, aws_subnet.private.id] # or private only
+  subnet_ids = [
+    aws_subnet.private_a.id,
+    aws_subnet.private_b.id
+  ]
+
+  tags = {
+    Name = "rds-subnet-group"
+  }
 }
+
 
 resource "aws_db_instance" "postgres" {
   identifier              = "node-api-db"
