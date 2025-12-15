@@ -1,0 +1,38 @@
+name: Deploy via OIDC
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<OIDC_ROLE_NAME>
+          aws-region: ap-south-1
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 \
+          | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com
+
+      - name: Build and Push Image
+        run: |
+          docker build -t node-crud-api .
+          docker tag node-crud-api:latest <ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/node-crud-api:latest
+          docker push <ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/node-crud-api:latest
+
+      - name: Terraform Deploy
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform apply -auto-approve

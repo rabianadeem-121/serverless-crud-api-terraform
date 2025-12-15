@@ -1,0 +1,24 @@
+{
+  "name": "serverless-crud-api-terraform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rabianadeem-121/serverless-crud-api-terraform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rabianadeem-121/serverless-crud-api-terraform/issues"
+  },
+  "homepage": "https://github.com/rabianadeem-121/serverless-crud-api-terraform#readme",
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
