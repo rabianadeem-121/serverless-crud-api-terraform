@@ -33,9 +33,8 @@ jobs:
           sudo apt install -y terraform
           terraform -version
 
-
-      # 3. Terraform Init & Apply (create ECR, RDS, etc.)
-      - name: Terraform Init & Apply
+      # 3. Terraform Init & Apply for ECR, IAM, VPC, RDS only
+      - name: Terraform Apply Infrastructure
         working-directory: terraform
         env:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
@@ -43,8 +42,7 @@ jobs:
           terraform init
           terraform fmt -check
           terraform validate
-          terraform apply -auto-approve
-
+          terraform apply -auto-approve -target=aws_ecr_repository.api -target=aws_iam_role.lambda_role -target=aws_vpc.main -target=aws_subnet.private -target=aws_db_instance.postgres
 
       # 4. Get ECR repository URL from Terraform output
       - name: Get ECR Repo URL
@@ -68,8 +66,8 @@ jobs:
           docker tag serverless-crud-api-terraform:latest $REPO_URL:latest
           docker push $REPO_URL:latest
 
-      # 8. Update Lambda to use new image (Terraform)
+      # 8. Terraform Apply Lambda (use existing image)
       - name: Terraform Deploy Lambda
         working-directory: terraform
         run: |
-          terraform apply -auto-approve
+          terraform apply -auto-approve -target=aws_lambda_function.crud_api

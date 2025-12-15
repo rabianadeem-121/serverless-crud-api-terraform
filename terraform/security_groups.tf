@@ -1,9 +1,7 @@
-# Lambda Security Group
+# Lambda SG
 resource "aws_security_group" "lambda_sg1" {
-  name   = "lambda-sg1"
+  name   = "lambda_sg1"
   vpc_id = aws_vpc.main.id
-
-  description = "SG for Lambda"
 
   egress {
     from_port   = 0
@@ -13,18 +11,16 @@ resource "aws_security_group" "lambda_sg1" {
   }
 }
 
-# RDS Security Group
+# RDS SG
 resource "aws_security_group" "rds_sg1" {
-  name   = "rds-sg1"
+  name   = "rds_sg1"
   vpc_id = aws_vpc.main.id
-
-  description = "SG for RDS"
 
   ingress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.lambda_sg1.id]  # Only RDS references Lambda SG
+    security_groups = [aws_security_group.lambda_sg1.id]  # only one-way
   }
 
   egress {
