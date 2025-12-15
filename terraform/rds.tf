@@ -15,7 +15,7 @@ resource "aws_db_instance" "postgres" {
   identifier              = "node-api-db"
   allocated_storage       = 20
   engine                  = "postgres"
-  engine_version          = "15.3"
+  engine_version          = "17.6"
   instance_class          = "db.t3.micro"
   db_name                    = "mydb"
   username                = var.db_username
