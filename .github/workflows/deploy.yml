@@ -28,7 +28,7 @@ jobs:
       - name: Build and Push Image
         run: |
           docker build -t node-crud-api .
-          docker tag node-crud-api:latest <ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/node-crud-api:latest
+          docker tag node-crud-api:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/node-crud-api:latest
           docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/node-crud-api:latest
 
       - name: Terraform Deploy
