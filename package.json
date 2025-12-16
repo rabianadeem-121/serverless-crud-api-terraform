@@ -20,8 +20,11 @@
     "url": "https://github.com/rabianadeem-121/serverless-crud-api-terraform/issues"
   },
   "homepage": "https://github.com/rabianadeem-121/serverless-crud-api-terraform#readme",
-  "dependencies": {
-    "dotenv": "^17.2.3",
-    "pg": "^8.16.3"
-  }
+"dependencies": {
+  "express": "^4.19.2",
+  "dotenv": "^17.2.3",
+  "pg": "^8.16.3"
 }
+
+  }
+

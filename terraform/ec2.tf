@@ -14,6 +14,7 @@ resource "aws_instance" "api_server" {
     systemctl start docker
     systemctl enable docker
     usermod -aG docker ec2-user
+    yum install -y awscli
 
     # Environment variables for RDS
     export DB_HOST=${aws_db_instance.postgres.address}
