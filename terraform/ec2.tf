@@ -45,7 +45,7 @@ aws ecr get-login-password --region ap-south-1 \
   | docker login --username AWS --password-stdin $ECR_REPO
 
 # Pull and run Docker container
-docker pull $ECR_REPO:latest
+docker pull $ECR_REPO:latest || echo "Docker pull failed"
 docker run -d \
   -p 3000:3000 \
   --restart unless-stopped \
@@ -56,7 +56,8 @@ docker run -d \
   -e DB_PASS=$DB_PASS \
   -e DB_NAME=$DB_NAME \
   -e PORT=$PORT \
-  $ECR_REPO:latest
+  $ECR_REPO:latest || echo "Docker run failed"
+
 EOF
 
 
