@@ -39,7 +39,7 @@ jobs:
         run: docker tag node-rest-api:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/node-rest-api:latest
 
       - name: Push Docker image to ECR
-        run: docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/node-rest-api:latest
+        run: docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
