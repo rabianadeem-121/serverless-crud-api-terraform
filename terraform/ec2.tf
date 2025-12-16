@@ -7,39 +7,49 @@ resource "aws_instance" "api_server" {
   key_name = var.key_name
 
   # <-- THIS IS WHERE THE EC2 CONNECTS TO RDS VIA USER DATA
-  user_data = <<-EOF
-    #!/bin/bash
-    yum update -y
-    yum install -y docker
-    systemctl start docker
-    systemctl enable docker
-    usermod -aG docker ec2-user
-    yum install -y awscli
+user_data = <<-EOF
+#!/bin/bash
+set -e
 
-    # Environment variables for RDS
-    export DB_HOST=${aws_db_instance.postgres.address}
-    export DB_PORT=5432
-    export DB_USER=${var.db_username}
-    export DB_PASS=${var.db_password}
-    export DB_NAME=mydb
-    export PORT=3000
+yum update -y
+yum install -y docker unzip
 
-    # Login to ECR and run Docker container
-    aws ecr get-login-password --region ap-south-1 \
-      | docker login --username AWS --password-stdin ${aws_ecr_repository.node_api.repository_url}
+# Install AWS CLI v2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+unzip awscliv2.zip
+./aws/install
 
-    docker pull ${aws_ecr_repository.node_api.repository_url}:latest
-    docker run -d \
-      -p 3000:3000 \
-      --name node-api \
-      -e DB_HOST=$DB_HOST \
-      -e DB_PORT=$DB_PORT \
-      -e DB_USER=$DB_USER \
-      -e DB_PASS=$DB_PASS \
-      -e DB_NAME=$DB_NAME \
-      -e PORT=$PORT \
-      ${aws_ecr_repository.node_api.repository_url}:latest
-  EOF
+systemctl start docker
+systemctl enable docker
+usermod -aG docker ec2-user
+
+# Environment variables for RDS
+export DB_HOST=${aws_db_instance.postgres.address}
+export DB_PORT=5432
+export DB_USER=${var.db_username}
+export DB_PASS=${var.db_password}
+export DB_NAME=mydb
+export PORT=3000
+
+# Login to ECR
+aws ecr get-login-password --region ap-south-1 \
+  | docker login --username AWS --password-stdin ${aws_ecr_repository.node_api.repository_url}
+
+# Pull and run Docker container
+docker pull ${aws_ecr_repository.node_api.repository_url}:latest
+docker run -d \
+  -p 3000:3000 \
+  --restart unless-stopped \
+  --name node-api \
+  -e DB_HOST=$DB_HOST \
+  -e DB_PORT=$DB_PORT \
+  -e DB_USER=$DB_USER \
+  -e DB_PASS=$DB_PASS \
+  -e DB_NAME=$DB_NAME \
+  -e PORT=$PORT \
+  ${aws_ecr_repository.node_api.repository_url}:latest
+EOF
+
 
   tags = {
     Name = "node-api-server"
