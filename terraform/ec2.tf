@@ -12,7 +12,7 @@ user_data = <<-EOF
 set -e
 
 yum update -y
-yum install -y docker unzip
+yum install -y docker unzip jq
 
 # Install AWS CLI v2
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
@@ -31,12 +31,21 @@ export DB_PASS=${var.db_password}
 export DB_NAME=mydb
 export PORT=3000
 
+ECR_REPO=${aws_ecr_repository.node_api.repository_url}
+
+# Wait until the Docker image exists in ECR
+echo "Waiting for Docker image to exist in ECR..."
+until aws ecr describe-images --repository-name $(basename $ECR_REPO) --image-ids imageTag=latest --region ap-south-1; do
+  echo "Image not found yet, retrying in 10 seconds..."
+  sleep 10
+done
+
 # Login to ECR
 aws ecr get-login-password --region ap-south-1 \
-  | docker login --username AWS --password-stdin ${aws_ecr_repository.node_api.repository_url}
+  | docker login --username AWS --password-stdin $ECR_REPO
 
 # Pull and run Docker container
-docker pull ${aws_ecr_repository.node_api.repository_url}:latest
+docker pull $ECR_REPO:latest
 docker run -d \
   -p 3000:3000 \
   --restart unless-stopped \
@@ -47,7 +56,7 @@ docker run -d \
   -e DB_PASS=$DB_PASS \
   -e DB_NAME=$DB_NAME \
   -e PORT=$PORT \
-  ${aws_ecr_repository.node_api.repository_url}:latest
+  $ECR_REPO:latest
 EOF
 
 
