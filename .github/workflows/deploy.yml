@@ -33,10 +33,10 @@ jobs:
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 011664843975.dkr.ecr.ap-south-1.amazonaws.com
 
       - name: Build Docker image
-        run: docker build -t node-rest-api .
+        run: docker build -t serverless-crud-api-terraform .
 
       - name: Tag Docker image for ECR
-        run: docker tag node-rest-api:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/node-rest-api:latest
+        run: docker tag serverless-crud-api-terraform:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
 
       - name: Push Docker image to ECR
         run: docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest

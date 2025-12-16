@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "node_api" {
-  name                 = "node-rest-api"
+  name                 = "serverless-crud-api-terraform"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
