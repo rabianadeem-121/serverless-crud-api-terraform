@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  id-token: write   # REQUIRED for OIDC
+  id-token: write
   contents: read
 
 jobs:
@@ -22,29 +22,16 @@ jobs:
           role-to-assume: arn:aws:iam::011664843975:role/github-permissions
           aws-region: ap-south-1
 
-      - name: Verify identity 
+      - name: Verify identity
         run: aws sts get-caller-identity
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to ECR
-        run: |
-          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 011664843975.dkr.ecr.ap-south-1.amazonaws.com
-
-      - name: Build Docker image
-        run: docker build -t serverless-crud-api-terraform .
-
-      - name: Tag Docker image for ECR
-        run: docker tag serverless-crud-api-terraform:latest 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
-
-      - name: Push Docker image to ECR
-        run: docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
-      
+      # -------------------------
+      # Terraform FIRST
+      # -------------------------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.7.3  # or latest stable
+          terraform_version: 1.7.3
 
       - name: Terraform Init
         working-directory: terraform
@@ -56,3 +43,26 @@ jobs:
         env:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_key_name: ${{ secrets.EC2_KEY_NAME }}
+
+      # -------------------------
+      # Docker AFTER ECR exists
+      # -------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 \
+          | docker login --username AWS --password-stdin 011664843975.dkr.ecr.ap-south-1.amazonaws.com
+
+      - name: Build Docker image
+        run: docker build -t serverless-crud-api-terraform .
+
+      - name: Tag Docker image
+        run: |
+          docker tag serverless-crud-api-terraform:latest \
+          011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
+
+      - name: Push Docker image
+        run: |
+          docker push 011664843975.dkr.ecr.ap-south-1.amazonaws.com/serverless-crud-api-terraform:latest
